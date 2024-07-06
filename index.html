@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.0/dist/phaser-arcade-physics.min.js"></script>
+    <script src="scripts/base_scenes.js"></script>
+</head>
+<body>
+
+    <script>
+    
+    class Bullseye extends Phaser.Scene {
+        constructor() {
+            super('BullseyeGrid')
+        }
+        preload () {
+            this.load.image('bullseye', 'assets/bullseye.svg');
+        }
+
+        create () {
+
+            const emitter = this.add.particles(0, 0, 'kaboom', {
+                lifespan: 500,
+                speed: { min: 100, max: 150 },
+                scale: { start: 2.0, end: 0 },
+                rotate: { start: 0, end: 40 },
+                gravityY: 10,
+                emitting: false
+            });
+
+            emitter.setDepth(1);
+            emitter.particleColor = 0x0000ff00;
+    
+            this.input.on('gameobjectdown', hitTarget)
+            this.input.on('gameobjectout', clearTarget)
+
+            const targets = [];
+            for (var i = 0; i < 8; i++) {
+                var newTarget = this.add.sprite(0,0, 'bullseye');
+                newTarget.setDisplaySize(285, 285)
+                var circleDimen = newTarget.width / 2;
+                var hitShape = new Phaser.Geom.Circle(circleDimen,circleDimen,circleDimen);
+                newTarget.setInteractive(hitShape, Phaser.Geom.Circle.Contains);
+                targets.push(newTarget)
+            }
+
+            Phaser.Actions.GridAlign(targets, {
+                width : 2,
+                height : 4,
+                cellWidth: targets[0].displayWidth + 10,
+                cellHeight: targets[0].displayHeight + 10,
+                x: 0,
+                y: 0
+            });    
+        }
+
+        update() {
+           
+        }
+    }
+
+    const config = {
+        type: Phaser.AUTO,
+        width: 720,
+        height: 1280,
+        scene: [Bullseye, HitDetectScene],
+        backgroundColor: '#fff',
+    };
+
+    function hitTarget(pointer, gameObject) {
+        gameObject.setTint(0x00ff00);
+        // Calculate score based on distance from center
+        pointer.x - gameObject.x
+    }
+ 
+    function clearTarget(pointer, gameObject) {
+        gameObject.clearTint();
+    }
+
+    function addParticle(scene, x, y) {
+        scene.add.particles(0,0,'hit', {
+
+        })
+    }
+ 
+    const game = new Phaser.Game(config);
+    </script>
+
+</body>
+</html>
